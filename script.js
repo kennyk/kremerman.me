@@ -49,8 +49,9 @@ function initializeCanvas() {
     offscreenCanvas = document.createElement( 'canvas' );
     offscreenCtx = offscreenCanvas.getContext( '2d' );
   }
-  offscreenCanvas.width = w;
-  offscreenCanvas.height = h;
+  offscreenCanvas.width = w * 2;
+  offscreenCanvas.height = h * 2;
+  offscreenCtx.scale( 2, 2 );
 
   opts.fontSize = Math.max( 60, Math.min( w * 0.12, 140 ) );
   opts.fontFamily = '900 ' + opts.fontSize + 'px "Source Code Pro", "Courier New", monospace';
@@ -111,7 +112,7 @@ function loop() {
   ctx.fillText( opts.text, opts.textX, opts.textY );
 
   ctx.globalCompositeOperation = 'source-in';
-  ctx.drawImage( offscreenCanvas, 0, 0 );
+  ctx.drawImage( offscreenCanvas, 0, 0, w, h );
 
   ctx.globalCompositeOperation = 'destination-over';
   ctx.fillStyle = 'black';
