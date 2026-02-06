@@ -3,14 +3,14 @@ var w, h, ctx,
 
     opts = {
 
-      len: 20,
+      len: 10,
       count: 80,
-      baseTime: 10,
-      addedTime: 10,
+      baseTime: 5,
+      addedTime: 5,
       dieChance: .05,
       spawnChance: 1,
       sparkChance: .1,
-      sparkDist: 10,
+      sparkDist: 5,
       sparkSize: 2,
 
       color: 'hsl(hue,100%,light%)',
