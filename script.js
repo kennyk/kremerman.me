@@ -70,7 +70,7 @@ function initializeCanvas() {
   for( var i = 0; i < opts.originCount; ++i ) {
     opts.origins.push({
       cx: leftEdge + ( rightEdge - leftEdge ) * ( i / ( opts.originCount - 1 ) ),
-      cy: opts.textY + ( Math.random() - 0.5 ) * opts.fontSize * 0.3
+      cy: opts.textY
     });
   }
 
