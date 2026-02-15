@@ -37,7 +37,8 @@ var w, h, ctx,
     lines = [],
     dieX, dieY,
 
-    baseRad = Math.PI * 2 / 6;
+    baseRad = Math.PI * 2 / 6,
+    debugView = false;
 
 function initializeCanvas() {
 
@@ -101,22 +102,27 @@ function loop() {
 
   lines.map( function( line ){ line.step(); } );
 
-  // --- Main canvas: text mask compositing ---
+  // --- Main canvas: compositing ---
   ctx.globalCompositeOperation = 'source-over';
   ctx.shadowBlur = 0;
   ctx.clearRect( 0, 0, w, h );
-  ctx.fillStyle = 'white';
-  ctx.font = opts.fontFamily;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText( opts.text, opts.textX, opts.textY );
 
-  ctx.globalCompositeOperation = 'source-in';
-  ctx.drawImage( offscreenCanvas, 0, 0, w, h );
+  if( debugView ) {
+    ctx.drawImage( offscreenCanvas, 0, 0, w, h );
+  } else {
+    ctx.fillStyle = 'white';
+    ctx.font = opts.fontFamily;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText( opts.text, opts.textX, opts.textY );
 
-  ctx.globalCompositeOperation = 'destination-over';
-  ctx.fillStyle = 'black';
-  ctx.fillRect( 0, 0, w, h );
+    ctx.globalCompositeOperation = 'source-in';
+    ctx.drawImage( offscreenCanvas, 0, 0, w, h );
+
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.fillStyle = 'black';
+    ctx.fillRect( 0, 0, w, h );
+  }
 }
 
 function Line() {
@@ -178,6 +184,10 @@ Line.prototype.step = function() {
 }
 
 loop();
+
+window.addEventListener( 'keydown', function( e ) {
+  if( e.key === 'd' ) debugView = !debugView;
+});
 
 window.addEventListener( 'resize', function() {
 
