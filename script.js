@@ -38,6 +38,7 @@ var w, h, ctx,
     dieX, dieY,
 
     baseRad = Math.PI * 2 / 6,
+    hexR = opts.len / Math.sqrt(3),
     debugView = false;
 
 function initializeCanvas() {
@@ -84,6 +85,19 @@ function initializeCanvas() {
 
 initializeCanvas();
 
+function drawHex(cx, cy) {
+  offscreenCtx.beginPath();
+  for (var i = 0; i < 6; ++i) {
+    var a = i * Math.PI / 3;
+    var vx = cx + hexR * Math.cos(a);
+    var vy = cy + hexR * Math.sin(a);
+    if (i === 0) offscreenCtx.moveTo(vx, vy);
+    else offscreenCtx.lineTo(vx, vy);
+  }
+  offscreenCtx.closePath();
+  offscreenCtx.fill();
+}
+
 function loop() {
 
   window.requestAnimationFrame( loop );
@@ -101,6 +115,30 @@ function loop() {
     lines.push( new Line );
 
   lines.map( function( line ){ line.step(); } );
+
+  // --- Hex glow ---
+  var hexFaces = {}, sqrt3 = Math.sqrt(3);
+  var faceDc = [3, 0, -3, -3, 0, 3], faceDr = [1, 2, 1, -1, -2, -1];
+  for (var i = 0; i < lines.length; ++i) {
+    var line = lines[i],
+        c3 = 3 * Math.round(line.x * 2),
+        r3 = 3 * Math.round(line.y * 2 / sqrt3),
+        okey = line.origin.cx + ':';
+    for (var j = 0; j < 6; ++j) {
+      var fc = c3 + faceDc[j], fr = r3 + faceDr[j],
+          key = okey + fc + ',' + fr;
+      if (!hexFaces[key])
+        hexFaces[key] = { n: 0, px: line.origin.cx + fc * opts.len / 6, py: line.origin.cy + fr * sqrt3 * opts.len / 6 };
+      hexFaces[key].n++;
+    }
+  }
+  offscreenCtx.shadowBlur = 0;
+  offscreenCtx.globalAlpha = 0.15;
+  offscreenCtx.fillStyle = opts.color.replace('hue', tick * opts.hueChange).replace('light', opts.baseLight + opts.addedLight);
+  for (var k in hexFaces)
+    if (hexFaces[k].n > 1)
+      drawHex(hexFaces[k].px, hexFaces[k].py);
+  offscreenCtx.globalAlpha = 1;
 
   // --- Main canvas: compositing ---
   ctx.globalCompositeOperation = 'source-over';
